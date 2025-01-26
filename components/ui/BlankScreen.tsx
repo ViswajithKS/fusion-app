@@ -1,10 +1,14 @@
-import { View, Text } from "react-native";
+import { useNavigation } from "expo-router";
+import { View, Text, Button } from "react-native";
 
 
 export default function BlankScreen(){
+    const navigation = useNavigation();
+
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}> 
             <Text>Blank Screen</Text>
+            <Button title="Go to Home" onPress={() => {navigation.navigate('Profile2')}} />
         </View>
     );
 }
