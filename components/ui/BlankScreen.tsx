@@ -8,7 +8,7 @@ export default function BlankScreen(){
     return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}> 
             <Text>Blank Screen</Text>
-            <Button title="Go to Home" />
+            <Button title="Go to Home" onPress={() => {navigation.navigate('blank screen')}} />
         </View>
     );
 }
