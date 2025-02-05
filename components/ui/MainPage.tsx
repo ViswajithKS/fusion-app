@@ -1,11 +1,24 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Platform } from "react-native";
+import { View, Text, ScrollView, Platform, Keyboard } from "react-native";
 import { Input, Icon, Button, Chip, SpeedDial } from "react-native-elements";
 
 export default function MainSreen() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
+
+  const handleSend = () => {
+    if (message === "") return;
+    setMessage(message);
+    setChat([
+      ...chat,
+      message,
+      Math.floor(
+        Math.random() * 10000000000000000000000000000000000000,
+      ).toString(),
+    ]);
+    setMessage("");
+  };
 
   return (
     <>
@@ -100,20 +113,7 @@ export default function MainSreen() {
                         padding: 8,
                       }}
                       name="send"
-                      onPress={() => {
-                        if (message == "") return;
-                        console.log(message);
-                        setMessage("");
-                        setChat([
-                          ...chat,
-                          message,
-                          Math.floor(
-                            Math.random() *
-                              10000000000000000000000000000000000000,
-                          ).toString(),
-                        ]);
-                        console.log(chat);
-                      }}
+                      onPress={handleSend}
                     />
                   }
                   placeholder="Type a message..."
@@ -131,6 +131,13 @@ export default function MainSreen() {
                     borderWidth: 2,
                   }}
                   onChangeText={(text) => setMessage(text)}
+                  onKeyPress={(e) => {
+                    if (e.nativeEvent.key == "Enter") {
+                      console.log("hi");
+                      Keyboard.dismiss();
+                      handleSend();
+                    }
+                  }}
                 />
               </View>
             </View>
