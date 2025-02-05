@@ -101,8 +101,7 @@ export default function MainSreen() {
                       }}
                       name="send"
                       onPress={() => {
-                        if (message=="")
-                          return;
+                        if (message == "") return;
                         console.log(message);
                         setMessage("");
                         setChat([
