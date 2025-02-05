@@ -5,7 +5,7 @@ import { Input, Icon, Button, Chip, SpeedDial } from "react-native-elements";
 export default function MainSreen() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<string[]>([]);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
