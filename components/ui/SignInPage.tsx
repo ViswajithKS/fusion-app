@@ -15,7 +15,7 @@ export default function SignInPage() {
       <Button
         title="Sign in with google"
         onPress={() => {
-          navigation.navigate("blank screen");
+          navigation.navigate("main page");
         }}
       />
     </View>
