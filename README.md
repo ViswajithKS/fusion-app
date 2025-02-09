@@ -23,42 +23,6 @@ redirect uri:"https://auth.expo.io/@viswajith777/fusion"
 }
 }, _/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     androidClientId:
       "1019337613483-u82ef3pk43tkglpii7iv4v1r54tjjgar.apps.googleusercontent.com",
     webClientId:
@@ -70,21 +34,20 @@ redirect uri:"https://auth.expo.io/@viswajith777/fusion"
           client_secret: "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",
           grant_type: "authorization_code",
           redirect_uri: "https://auth.expo.io/@viswajith777/fusion",
+
 "clientId": "1019337613483-fef1mnpeuaugvgs416imgh3577dveliq.apps.googleusercontent.com",
-          "redirectUri": "https://auth.expo.io/@viswajith777/fusion"
+"redirectUri": "https://auth.expo.io/@viswajith777/fusion"
 Client ID
-    1019337613483-fef1mnpeuaugvgs416imgh3577dveliq.apps.googleusercontent.com 
+1019337613483-fef1mnpeuaugvgs416imgh3577dveliq.apps.googleusercontent.com
 Creation date
-    February 8, 2025 at 11:10:10 AM GMT+5
+February 8, 2025 at 11:10:10 AM GMT+5
 
 Client secrets
 If you are in the process of changing client secrets, you can manually rotate them without downtime. Learn more
 
 Client secret
-    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 
+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
 https://auth.expo.io/@viswajith777/fusion
-     1019337613483-u82ef3pk43tkglpii7iv4v1r54tjjgar.apps.googleusercontent.com 
+1019337613483-u82ef3pk43tkglpii7iv4v1r54tjjgar.apps.googleusercontent.com
 AA:0B:89:9C:2B:FF:AF:8A:AD:94:42:DB:3F:4B:EE:BC:FE:67:B1:A8
 https://auth.expo.io/@viswajith777/fusion
-
-

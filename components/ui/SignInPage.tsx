@@ -1,9 +1,8 @@
 import { View, Button, Text } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect, useState } from "react";
-import * as AuthSession from 'expo-auth-session';
-const jwtDecode = require('jwt-decode');
-
+import * as AuthSession from "expo-auth-session";
+const jwtDecode = require("jwt-decode");
 
 export default function SignInPage() {
   const [token, setToken] = useState(null);
@@ -15,14 +14,16 @@ export default function SignInPage() {
       "1019337613483-fef1mnpeuaugvgs416imgh3577dveliq.apps.googleusercontent.com",
     responseType: "code",
     usePKCE: true,
-    redirectUri:AuthSession.makeRedirectUri(),
+    redirectUri: AuthSession.makeRedirectUri(),
     scopes: ["openid", "profile", "email"],
   });
 
   useEffect(() => {
     if (response?.type === "success" && response?.params?.code) {
       console.log("Authentication success:", response);
-      const decodedToken = jwtDecode.jwtDecode(response.authentication?.idToken);
+      const decodedToken = jwtDecode.jwtDecode(
+        response.authentication?.idToken,
+      );
       setToken(decodedToken.name);
     } else {
       console.error("❌ Authentication Failed:", response);
@@ -62,7 +63,7 @@ export default function SignInPage() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text>{token ? `Token: ${token}` : "No token"}</Text>
-      
+
       <Button
         title="Sign in with Google"
         onPress={async () => {
