@@ -133,9 +133,9 @@ export default function MainSreen() {
                   onChangeText={(text) => setMessage(text)}
                   onKeyPress={(e) => {
                     if (e.nativeEvent.key == "Enter") {
-                      console.log("hi");
                       Keyboard.dismiss();
                       handleSend();
+                      setMessage(" ");
                     }
                   }}
                 />

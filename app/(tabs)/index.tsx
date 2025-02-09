@@ -1,14 +1,18 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BlankScreen from "../../components/ui/BlankScreen";
-import SignInPage from "@/components/ui/SignInPage";
-import MainPage from "@/components/ui/MainPage";
-const Stack = createNativeStackNavigator();
+import SignInPage from "./SignInPage";
+import MainPage from "./MainPage";
+import BlankScreen from "./BlankScreen";
+import { NavigationContainer } from "@react-navigation/native";
 
 export default function App() {
+  const Stack = createNativeStackNavigator();
   return (
-    <Stack.Navigator>
+    /*
+    <Stack.Navigator initialRouteName="sign in page">
       <Stack.Screen name="sign in page" component={SignInPage} />
       <Stack.Screen name="main page" component={MainPage} />
     </Stack.Navigator>
+    */
+    <SignInPage />
   );
 }
