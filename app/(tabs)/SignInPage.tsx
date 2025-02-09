@@ -54,7 +54,7 @@ export default function SignInPage() {
         onPress={async () => {
           const result = await promptAsync();
           if (result.type === "success") {
-            //router.replace("/MainPage");
+            router.replace("/MainPage");
           }
         }}
       />
