@@ -3,7 +3,6 @@ import { View, Text, Button } from "react-native";
 
 export default function BlankScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

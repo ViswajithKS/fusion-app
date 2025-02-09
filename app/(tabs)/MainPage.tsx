@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Platform, Keyboard } from "react-native";
-import { Input, Icon, Button, Chip, SpeedDial } from "react-native-elements";
+import { View, Text, ScrollView, Keyboard } from "react-native";
+import { Input, Icon, Chip, SpeedDial } from "react-native-elements";
 
 export default function MainSreen() {
   const [message, setMessage] = useState("");
