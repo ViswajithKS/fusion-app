@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Keyboard, Platform } from "react-native";
 import { Input, Icon, Chip, SpeedDial } from "react-native-elements";
+import Constants from "expo-constants";
 
+const HUGGINGFACE_KEY = Constants.expoConfig?.extra?.HUGGINGFACE_KEY ?? "";
 export default function MainSreen() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<string[]>([]);
@@ -23,7 +25,7 @@ export default function MainSreen() {
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer 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`,
+          Authorization: HUGGINGFACE_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ inputs: prompt }),
