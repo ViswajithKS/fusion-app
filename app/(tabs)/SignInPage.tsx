@@ -6,13 +6,12 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 
 const ANDROID_CLIENT_ID = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID ?? "";
 const IOS_CLIENT_ID = Constants.expoConfig?.extra?.IOS_CLIENT_ID ?? "";
 const WEB_CLIENT_ID = Constants.expoConfig?.extra?.WEB_CLIENT_ID ?? "";
 const WEB_CLIENT_SECRET = Constants.expoConfig?.extra?.WEB_CLIENT_SECRET ?? "";
-
 
 if (Platform.OS === "web") {
   WebBrowser.maybeCompleteAuthSession();
@@ -28,10 +27,8 @@ export default function SignInPage() {
       : AuthSession.makeRedirectUri();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId:
-      ANDROID_CLIENT_ID,
-    webClientId:
-      WEB_CLIENT_ID,
+    androidClientId: ANDROID_CLIENT_ID,
+    webClientId: WEB_CLIENT_ID,
     responseType: "code",
     usePKCE: true,
     redirectUri,
