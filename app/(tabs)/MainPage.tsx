@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Keyboard } from "react-native";
+import { View, Text, ScrollView, Keyboard, Platform } from "react-native";
 import { Input, Icon, Chip, SpeedDial } from "react-native-elements";
 
 export default function MainSreen() {
@@ -7,18 +7,32 @@ export default function MainSreen() {
   const [chat, setChat] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (message === "") return;
-    setMessage(message);
-    setChat([
-      ...chat,
-      message,
-      Math.floor(
-        Math.random() * 10000000000000000000000000000000000000,
-      ).toString(),
-    ]);
+    const prompt = message;
+    setChat([...chat, message]);
+    setMessage("Thinking...");
+    const res = await recieveResponse(prompt);
+    setChat([...chat, message, res]);
     setMessage("");
   };
+
+  async function recieveResponse(prompt: string) {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-alpha",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer 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`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inputs: prompt }),
+      },
+    );
+
+    const data = await response.json();
+    return data[0]?.generated_text || "No response.";
+  }
 
   return (
     <>
@@ -34,7 +48,7 @@ export default function MainSreen() {
           }}
         >
           <View style={{ flex: 1, backgroundColor: "red" }}>
-            <Text style={{ alignSelf: "center" }}>Welcome User!</Text>
+            <Text style={{ alignSelf: "center" }}>welcome user</Text>
           </View>
           <View
             style={{
@@ -58,6 +72,7 @@ export default function MainSreen() {
                   const alignment = index % 2 === 0 ? "flex-end" : "flex-start";
                   return (
                     <Chip
+                      key={index}
                       containerStyle={{
                         alignSelf: alignment,
                         maxWidth: "80%",
@@ -130,12 +145,15 @@ export default function MainSreen() {
                     margin: 10,
                     borderWidth: 2,
                   }}
-                  onChangeText={(text) => setMessage(text)}
+                  onChangeText={(text) => {
+                    if (message !== "Thinking...") {
+                      setMessage(text);
+                    }
+                  }}
                   onKeyPress={(e) => {
-                    if (e.nativeEvent.key == "Enter") {
+                    if (e.nativeEvent.key == "Enter" && Platform.OS === "web") {
                       Keyboard.dismiss();
                       handleSend();
-                      setMessage(" ");
                     }
                   }}
                 />

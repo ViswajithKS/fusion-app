@@ -1,20 +1,23 @@
-import { View, Button, Text, Platform } from "react-native";
+import { View, Button, Text, Platform, ActivityIndicator } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect, useState } from "react";
 import * as AuthSession from "expo-auth-session";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-const jwtDecode = require("jwt-decode");
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+
 if (Platform.OS === "web") {
   WebBrowser.maybeCompleteAuthSession();
 }
 
 export default function SignInPage() {
   const router = useRouter();
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const redirectUri =
     Platform.OS === "web"
-      ? window.location.origin // Web should redirect to the app
+      ? window.location.origin
       : AuthSession.makeRedirectUri();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -31,31 +34,62 @@ export default function SignInPage() {
     }),
   });
 
+  const storeToken = async (token: string) => {
+    if (Platform.OS === "web") {
+      await AsyncStorage.setItem("auth_token", token);
+    } else {
+      await SecureStore.setItemAsync("auth_token", token);
+    }
+  };
+
+  const getToken = async () => {
+    if (Platform.OS === "web") {
+      return await AsyncStorage.getItem("auth_token");
+    } else {
+      return await SecureStore.getItemAsync("auth_token");
+    }
+  };
+
+  const checkStoredToken = async () => {
+    const storedToken = await getToken();
+    if (storedToken) {
+      setToken(storedToken);
+      router.replace("/MainPage");
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    if (response) {
-      if (response?.type === "success") {
-        console.log("Authentication success:");
-        const decodedToken = jwtDecode.jwtDecode(
-          response?.authentication?.idToken,
-        );
-        setToken(decodedToken.email);
-      } else {
-        console.error("❌ Authentication Failed:", response);
+    checkStoredToken();
+  }, []);
+
+  useEffect(() => {
+    if (response?.type === "success") {
+      const accessToken = response.authentication?.accessToken;
+      if (accessToken) {
+        setToken(accessToken);
+        storeToken(accessToken);
+        router.replace("/MainPage");
       }
     }
   }, [response]);
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>{token ? `Token: ${token}` : "No token"}</Text>
+      <Text>{token ? `Logged in` : "Sign in with Google"}</Text>
 
       <Button
         title="Sign in with Google"
         onPress={async () => {
-          const result = await promptAsync();
-          if (result.type === "success") {
-            router.replace("/MainPage");
-          }
+          await promptAsync();
         }}
       />
     </View>
