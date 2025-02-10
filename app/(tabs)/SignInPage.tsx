@@ -6,6 +6,13 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
+import Constants from 'expo-constants';
+
+const ANDROID_CLIENT_ID = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID ?? "";
+const IOS_CLIENT_ID = Constants.expoConfig?.extra?.IOS_CLIENT_ID ?? "";
+const WEB_CLIENT_ID = Constants.expoConfig?.extra?.WEB_CLIENT_ID ?? "";
+const WEB_CLIENT_SECRET = Constants.expoConfig?.extra?.WEB_CLIENT_SECRET ?? "";
+
 
 if (Platform.OS === "web") {
   WebBrowser.maybeCompleteAuthSession();
@@ -22,15 +29,15 @@ export default function SignInPage() {
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId:
-      "1019337613483-u82ef3pk43tkglpii7iv4v1r54tjjgar.apps.googleusercontent.com",
+      ANDROID_CLIENT_ID,
     webClientId:
-      "1019337613483-fef1mnpeuaugvgs416imgh3577dveliq.apps.googleusercontent.com",
+      WEB_CLIENT_ID,
     responseType: "code",
     usePKCE: true,
     redirectUri,
     scopes: ["openid", "profile", "email"],
     ...(Platform.OS === "web" && {
-      clientSecret: "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",
+      clientSecret: WEB_CLIENT_SECRET,
     }),
   });
 
