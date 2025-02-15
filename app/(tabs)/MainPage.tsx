@@ -72,7 +72,7 @@ export default function MainSreen() {
                 //paddingRight: 20,
                 //paddingLeft: 20,
                 padding: 3,
-                borderWidth: 1,
+                borderWidth: 2,
                 margin: 10,
               }}
             >
@@ -89,6 +89,7 @@ export default function MainSreen() {
                         alignSelf: alignment,
                         maxWidth: "80%",
                         marginVertical: 5,
+                        marginRight: 15,
                       }}
                       title={message}
                     />
@@ -130,7 +131,7 @@ export default function MainSreen() {
                 flexDirection: "row",
               }}
             >
-              <View style={{ flex: 3 }}>
+              <View style={{ flex: 3, padding: 1 }}>
                 <Input
                   multiline={true}
                   numberOfLines={3}
@@ -140,8 +141,9 @@ export default function MainSreen() {
                       containerStyle={{
                         //backgroundColor: "white",
                         borderRadius: 50,
-                        padding: 8,
+                        padding: 5,
                         borderWidth: 2,
+                        alignSelf: "center",
                       }}
                       name="send"
                       onPress={handleSend}
@@ -149,20 +151,26 @@ export default function MainSreen() {
                   }
                   placeholder="Type a message..."
                   inputContainerStyle={{
-                    //backgroundColor: "gray",
+                    backgroundColor: "white",
                     width: "100%",
+                    minHeight: 80,
                     alignSelf: "flex-end",
                     shadowColor: "#000",
                     shadowOffset: { width: 0, height: 3 },
                     shadowOpacity: 0.3,
-                    shadowRadius: 5,
+                    shadowRadius: 1,
                     elevation: 5,
+                    padding: 5,
+                    borderBottomWidth: 0,
+                    borderRadius: 10,
                   }}
                   inputStyle={{
                     //backgroundColor: "white",
                     borderWidth: 0,
                     padding: 10,
                     outline: "none",
+                    borderBottomWidth: 0,
+                    borderRadius: 10,
                     //margin: 10,
                   }}
                   onChangeText={(text) => {
