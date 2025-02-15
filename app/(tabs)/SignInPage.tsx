@@ -1,4 +1,5 @@
-import { View, Button, Text, Platform, ActivityIndicator } from "react-native";
+import { View, Text, Platform, ActivityIndicator } from "react-native";
+import { Button } from "react-native-elements";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect, useState } from "react";
 import * as AuthSession from "expo-auth-session";
@@ -7,6 +8,7 @@ import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import Constants from "expo-constants";
+import { useFonts } from "expo-font";
 
 const ANDROID_CLIENT_ID = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID ?? "";
 const IOS_CLIENT_ID = Constants.expoConfig?.extra?.IOS_CLIENT_ID ?? "";
@@ -21,6 +23,9 @@ export default function SignInPage() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fontsLoaded] = useFonts({
+    "PublicSans-Black": require("../../assets/fonts/PublicSans-Black.ttf"),
+  });
   const redirectUri =
     Platform.OS === "web"
       ? window.location.origin
@@ -88,10 +93,20 @@ export default function SignInPage() {
 
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>{token ? `Logged in` : "Sign in with Google"}</Text>
-
       <Button
         title="Sign in with Google"
+        buttonStyle={{
+          backgroundColor: "black",
+          borderWidth: 2,
+          borderColor: "white",
+          borderRadius: 30,
+        }}
+        containerStyle={{
+          width: 200,
+          marginHorizontal: 50,
+          marginVertical: 10,
+        }}
+        titleStyle={{ fontFamily: "PublicSans-Black" }}
         onPress={async () => {
           await promptAsync();
         }}
