@@ -8,7 +8,7 @@ import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { useFonts } from "expo-font";
-import config from '../../config';
+import config from "../../config";
 
 if (Platform.OS === "web") {
   WebBrowser.maybeCompleteAuthSession();
@@ -61,15 +61,15 @@ export default function SignInPage() {
     const storedToken = await getToken();
     if (storedToken) {
       setToken(storedToken);
-      router.replace('/MainPage');
+      router.replace("/MainPage");
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    const check=async()=>{
-    await checkStoredToken();
-    }
+    const check = async () => {
+      await checkStoredToken();
+    };
     check();
   }, [token]);
 
@@ -78,9 +78,9 @@ export default function SignInPage() {
       if (response?.type === "success") {
         const accessToken = response?.authentication?.accessToken;
         const idToken = response?.authentication?.idToken;
-        
+
         if (idToken) {
-          if (Platform.OS === 'web') {
+          if (Platform.OS === "web") {
             await AsyncStorage.setItem("id_token", idToken);
           } else {
             await SecureStore.setItemAsync("id_token", idToken);
@@ -92,10 +92,9 @@ export default function SignInPage() {
         }
       }
     };
-  
+
     handleAuth();
   }, [response]);
-  
 
   if (loading) {
     return (

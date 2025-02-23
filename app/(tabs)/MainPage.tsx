@@ -5,7 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 const jwtDecode = require("jwt-decode");
-import config from '../../config';
+import config from "../../config";
 
 interface DecodedToken {
   email: string;

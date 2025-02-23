@@ -3,11 +3,7 @@
     "name": "fusion",
     "slug": "fusion",
     "owner": "viswajith777",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "default",
     "scheme": "com.fusion.app",
