@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, Keyboard, Platform } from "react-native";
 import { Input, Icon, Chip, SpeedDial, Dialog } from "react-native-elements";
-import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 const jwtDecode = require("jwt-decode");
+import config from '../../config';
 
 interface DecodedToken {
   email: string;
   name: string;
 }
 
-const HUGGINGFACE_KEY = Constants.manifest?.extra?.HUGGINGFACE_KEY ?? "";
 export default function MainSreen() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<string[]>([]);
@@ -38,7 +37,6 @@ export default function MainSreen() {
   }, []);
 
   const handleSend = async () => {
-    console.log('KEY IS ',HUGGINGFACE_KEY);
     if (message === "") return;
     const prompt = message;
     setChat([...chat, message]);
@@ -67,7 +65,7 @@ export default function MainSreen() {
       {
         method: "POST",
         headers: {
-          Authorization: HUGGINGFACE_KEY,
+          Authorization: config.HUGGINGFACE_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ inputs: prompt }),
@@ -247,7 +245,6 @@ export default function MainSreen() {
                     if (e.nativeEvent.key == "Enter" && Platform.OS === "web") {
                       Keyboard.dismiss();
                       handleSend();
-                      console.log("key is ",HUGGINGFACE_KEY);
                     }
                   }}
                 />

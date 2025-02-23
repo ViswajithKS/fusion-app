@@ -1,4 +1,4 @@
-import { View, Text, Platform, ActivityIndicator } from "react-native";
+import { View, Platform, ActivityIndicator } from "react-native";
 import { Button } from "react-native-elements";
 import * as Google from "expo-auth-session/providers/google";
 import { useEffect, useState } from "react";
@@ -7,13 +7,8 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
-import Constants from "expo-constants";
 import { useFonts } from "expo-font";
-
-const ANDROID_CLIENT_ID = Constants.manifest?.extra?.ANDROID_CLIENT_ID ?? "";
-const IOS_CLIENT_ID = Constants.manifest?.extra?.IOS_CLIENT_ID ?? "";
-const WEB_CLIENT_ID = Constants.manifest?.extra?.WEB_CLIENT_ID ?? "";
-const WEB_CLIENT_SECRET = Constants.manifest?.extra?.WEB_CLIENT_SECRET ?? "";
+import config from '../../config';
 
 if (Platform.OS === "web") {
   WebBrowser.maybeCompleteAuthSession();
@@ -32,9 +27,8 @@ export default function SignInPage() {
       : AuthSession.makeRedirectUri();
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: ANDROID_CLIENT_ID,
-    webClientId: WEB_CLIENT_ID,
-    //webClientId:"1019337613483-fef1mnpeuaugvgs416imgh3577dveliq.apps.googleusercontent.com",
+    androidClientId: config.ANDROID_CLIENT_ID,
+    webClientId: config.WEB_CLIENT_ID,
     responseType: "code",
     usePKCE: true,
     redirectUri,
@@ -43,8 +37,7 @@ export default function SignInPage() {
     },
     scopes: ["openid", "profile", "email"],
     ...(Platform.OS === "web" && {
-      clientSecret: WEB_CLIENT_SECRET,
-      //clientSecret:"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"
+      clientSecret: config.WEB_CLIENT_SECRET,
     }),
   });
 
@@ -79,10 +72,6 @@ export default function SignInPage() {
     }
     check();
   }, [token]);
-
-  useEffect(()=>{
-    console.log("TOKEN IS ", token , "AND RESPONSE IS ", response);
-  },[response])
 
   useEffect(() => {
     const handleAuth = async () => {
@@ -134,7 +123,6 @@ export default function SignInPage() {
         titleStyle={{ fontFamily: "PublicSans-Black" }}
         onPress={async () => {
           await promptAsync();
-          console.log('KEY IS',ANDROID_CLIENT_ID,WEB_CLIENT_ID);
         }}
       />
     </View>
