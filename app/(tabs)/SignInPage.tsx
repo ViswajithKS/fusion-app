@@ -10,10 +10,10 @@ import * as SecureStore from "expo-secure-store";
 import Constants from "expo-constants";
 import { useFonts } from "expo-font";
 
-const ANDROID_CLIENT_ID = Constants.expoConfig?.extra?.ANDROID_CLIENT_ID ?? "";
-const IOS_CLIENT_ID = Constants.expoConfig?.extra?.IOS_CLIENT_ID ?? "";
-const WEB_CLIENT_ID = Constants.expoConfig?.extra?.WEB_CLIENT_ID ?? "";
-const WEB_CLIENT_SECRET = Constants.expoConfig?.extra?.WEB_CLIENT_SECRET ?? "";
+const ANDROID_CLIENT_ID = Constants.manifest?.extra?.ANDROID_CLIENT_ID ?? "";
+const IOS_CLIENT_ID = Constants.manifest?.extra?.IOS_CLIENT_ID ?? "";
+const WEB_CLIENT_ID = Constants.manifest?.extra?.WEB_CLIENT_ID ?? "";
+const WEB_CLIENT_SECRET = Constants.manifest?.extra?.WEB_CLIENT_SECRET ?? "";
 
 if (Platform.OS === "web") {
   WebBrowser.maybeCompleteAuthSession();
@@ -34,12 +34,17 @@ export default function SignInPage() {
   const [request, response, promptAsync] = Google.useAuthRequest({
     androidClientId: ANDROID_CLIENT_ID,
     webClientId: WEB_CLIENT_ID,
+    //webClientId:"1019337613483-fef1mnpeuaugvgs416imgh3577dveliq.apps.googleusercontent.com",
     responseType: "code",
     usePKCE: true,
     redirectUri,
+    extraParams: {
+      prompt: "select_account",
+    },
     scopes: ["openid", "profile", "email"],
     ...(Platform.OS === "web" && {
       clientSecret: WEB_CLIENT_SECRET,
+      //clientSecret:"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"
     }),
   });
 
@@ -63,25 +68,45 @@ export default function SignInPage() {
     const storedToken = await getToken();
     if (storedToken) {
       setToken(storedToken);
-      router.replace("/MainPage");
+      router.replace('/MainPage');
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    checkStoredToken();
-  }, []);
+    const check=async()=>{
+    await checkStoredToken();
+    }
+    check();
+  }, [token]);
+
+  useEffect(()=>{
+    console.log("TOKEN IS ", token , "AND RESPONSE IS ", response);
+  },[response])
 
   useEffect(() => {
-    if (response?.type === "success") {
-      const accessToken = response.authentication?.accessToken;
-      if (accessToken) {
-        setToken(accessToken);
-        storeToken(accessToken);
-        router.replace("/MainPage");
+    const handleAuth = async () => {
+      if (response?.type === "success") {
+        const accessToken = response?.authentication?.accessToken;
+        const idToken = response?.authentication?.idToken;
+        
+        if (idToken) {
+          if (Platform.OS === 'web') {
+            await AsyncStorage.setItem("id_token", idToken);
+          } else {
+            await SecureStore.setItemAsync("id_token", idToken);
+          }
+        }
+        if (accessToken) {
+          setToken(accessToken);
+          await storeToken(accessToken);
+        }
       }
-    }
+    };
+  
+    handleAuth();
   }, [response]);
+  
 
   if (loading) {
     return (
@@ -109,6 +134,7 @@ export default function SignInPage() {
         titleStyle={{ fontFamily: "PublicSans-Black" }}
         onPress={async () => {
           await promptAsync();
+          console.log('KEY IS',ANDROID_CLIENT_ID,WEB_CLIENT_ID);
         }}
       />
     </View>

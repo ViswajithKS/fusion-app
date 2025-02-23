@@ -1,4 +1,4 @@
-import { useNavigation, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { View, Text, Button } from "react-native";
 
 export default function BlankScreen() {
@@ -10,7 +10,7 @@ export default function BlankScreen() {
       <Button
         title="Go to Home"
         onPress={() => {
-          router.push("./SignInPage");
+          router.replace("/SignInPage");
         }}
       />
     </View>

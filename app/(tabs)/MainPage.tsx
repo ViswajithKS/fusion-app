@@ -1,17 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, Keyboard, Platform } from "react-native";
-import { Input, Icon, Chip, SpeedDial } from "react-native-elements";
+import { Input, Icon, Chip, SpeedDial, Dialog } from "react-native-elements";
 import Constants from "expo-constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import { router } from "expo-router";
+const jwtDecode = require("jwt-decode");
 
-const HUGGINGFACE_KEY = Constants.expoConfig?.extra?.HUGGINGFACE_KEY ?? "";
+interface DecodedToken {
+  email: string;
+  name: string;
+}
+
+const HUGGINGFACE_KEY = Constants.manifest?.extra?.HUGGINGFACE_KEY ?? "";
 export default function MainSreen() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
-  const [token, setToken] = useState(null);
+  const [decoded, setDecoded] = useState<DecodedToken | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const fetchIdToken = async () => {
+      let token;
+      if (Platform.OS == "web") {
+        token = await AsyncStorage.getItem("id_token");
+      } else {
+        token = await SecureStore.getItemAsync("id_token");
+      }
+      if (token) {
+        const decodedToken = jwtDecode.jwtDecode(token);
+        setDecoded(decodedToken);
+      }
+    };
+
+    fetchIdToken();
+  }, []);
 
   const handleSend = async () => {
+    console.log('KEY IS ',HUGGINGFACE_KEY);
     if (message === "") return;
     const prompt = message;
     setChat([...chat, message]);
@@ -19,6 +46,19 @@ export default function MainSreen() {
     const res = await recieveResponse(prompt);
     setChat([...chat, message, res]);
     setMessage("");
+  };
+
+  const logout = async () => {
+    if (Platform.OS === "web") {
+      await AsyncStorage.removeItem("auth_token");
+      await AsyncStorage.removeItem("access_token");
+      await AsyncStorage.removeItem("id_token");
+    } else {
+      await SecureStore.deleteItemAsync("auth_token");
+      await SecureStore.deleteItemAsync("access_token");
+      await SecureStore.deleteItemAsync("id_token");
+    }
+    router.replace("/SignInPage");
   };
 
   async function recieveResponse(prompt: string) {
@@ -41,6 +81,24 @@ export default function MainSreen() {
   return (
     <>
       <View style={{ flex: 1 }}>
+        <Dialog
+          overlayStyle={{ borderRadius: 10, paddingRight: 50, maxWidth: 500 }}
+          isVisible={visible}
+          onBackdropPress={() => setVisible(false)}
+        >
+          <Dialog.Title title="Are you sure you want to logout?" />
+          <Dialog.Actions>
+            <Dialog.Button title="Cancel" onPress={() => setVisible(false)} />
+            <Dialog.Button
+              title="Yes"
+              onPress={async () => {
+                setVisible(false);
+                logout();
+              }}
+            />
+          </Dialog.Actions>
+        </Dialog>
+
         <View
           style={{
             width: "100%",
@@ -53,10 +111,17 @@ export default function MainSreen() {
         >
           <View
             style={{
-              flex: 1, //backgroundColor: "red"
+              minHeight: 20, //backgroundColor: "red"
             }}
           >
-            <Text style={{ alignSelf: "center" }}>welcome {token}</Text>
+            <Text style={{ alignSelf: "center" }}>welcome {decoded?.name}</Text>
+            <Icon
+              containerStyle={{ alignSelf: "flex-end", marginRight: 10 }}
+              name="logout"
+              onPress={() => {
+                setVisible(true);
+              }}
+            ></Icon>
           </View>
           <View
             style={{
@@ -182,6 +247,7 @@ export default function MainSreen() {
                     if (e.nativeEvent.key == "Enter" && Platform.OS === "web") {
                       Keyboard.dismiss();
                       handleSend();
+                      console.log("key is ",HUGGINGFACE_KEY);
                     }
                   }}
                 />
