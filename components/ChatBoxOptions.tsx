@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { SpeedDial } from "react-native-elements";
 function ChatBoxOptions() {
@@ -20,7 +21,7 @@ function ChatBoxOptions() {
         icon={{ name: "add", color: "#fff" }}
         iconContainerStyle={{ backgroundColor: "black" }}
         title="add"
-        onPress={() => console.log("Add Something")}
+        onPress={() => router.replace("/CalendarEventForm")}
       />
       <SpeedDial.Action
         icon={{ name: "delete", color: "#fff" }}

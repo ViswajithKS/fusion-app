@@ -35,7 +35,7 @@ function InputBox({ message, setMessage, handleSend }: InputBoxProps) {
               onPress={handleSend}
             />
           }
-          placeholder="Type a message..."
+          placeholder="click on the + button at the left to start testing google calendar event creation"
           inputContainerStyle={{
             backgroundColor: "white",
             width: "100%",
@@ -65,9 +65,17 @@ function InputBox({ message, setMessage, handleSend }: InputBoxProps) {
             }
           }}
           onKeyPress={async (e) => {
-            if (e.nativeEvent.key == "Enter" && Platform.OS === "web") {
-              Keyboard.dismiss();
-              handleSend();
+            if (Platform.OS === "web") {
+              const event = e.nativeEvent as any;
+              if (event.key === "Enter" && !event.shiftKey) {
+                Keyboard.dismiss();
+                handleSend();
+              }
+            } else {
+              if (e.nativeEvent.key === "Enter") {
+                Keyboard.dismiss();
+                handleSend();
+              }
             }
           }}
         />

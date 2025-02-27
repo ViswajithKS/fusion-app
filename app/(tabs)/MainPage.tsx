@@ -3,7 +3,11 @@ import { View, Text } from "react-native";
 import { router } from "expo-router";
 const jwtDecode = require("jwt-decode");
 import config from "../../config";
-import { storeIdToken, storeAccessToken, getIdToken } from "./tokenManager";
+import {
+  storeIdToken,
+  storeAccessToken,
+  getIdToken,
+} from "../../components/google credentials/token_manager";
 import { ChatBoxOptions } from "@/components/ChatBoxOptions";
 import { LogoutDialog, LogoutButton } from "@/components/Logout";
 import { ChatScrollView } from "@/components/ChatScrollView";
