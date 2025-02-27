@@ -10,7 +10,7 @@ export default function BlankScreen() {
       <Button
         title="Go to Home"
         onPress={() => {
-          router.replace("/SignInPage");
+          router.replace(`/SignInPage`);
         }}
       />
     </View>

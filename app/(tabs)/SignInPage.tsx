@@ -5,10 +5,9 @@ import { useEffect, useState } from "react";
 import * as AuthSession from "expo-auth-session";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SecureStore from "expo-secure-store";
 import { useFonts } from "expo-font";
 import config from "../../config";
+import { storeIdToken, storeAccessToken } from "./tokenManager";
 
 if (Platform.OS === "web") {
   WebBrowser.maybeCompleteAuthSession();
@@ -16,8 +15,7 @@ if (Platform.OS === "web") {
 
 export default function SignInPage() {
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [fontsLoaded] = useFonts({
     "PublicSans-Black": require("../../assets/fonts/PublicSans-Black.ttf"),
   });
@@ -41,58 +39,20 @@ export default function SignInPage() {
     }),
   });
 
-  const storeToken = async (token: string) => {
-    if (Platform.OS === "web") {
-      await AsyncStorage.setItem("auth_token", token);
-    } else {
-      await SecureStore.setItemAsync("auth_token", token);
-    }
-  };
-
-  const getToken = async () => {
-    if (Platform.OS === "web") {
-      return await AsyncStorage.getItem("auth_token");
-    } else {
-      return await SecureStore.getItemAsync("auth_token");
-    }
-  };
-
-  const checkStoredToken = async () => {
-    const storedToken = await getToken();
-    if (storedToken) {
-      setToken(storedToken);
-      router.replace("/MainPage");
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    const check = async () => {
-      await checkStoredToken();
-    };
-    check();
-  }, [token]);
-
   useEffect(() => {
     const handleAuth = async () => {
-      if (response?.type === "success") {
-        const accessToken = response?.authentication?.accessToken;
-        const idToken = response?.authentication?.idToken;
-
-        if (idToken) {
-          if (Platform.OS === "web") {
-            await AsyncStorage.setItem("id_token", idToken);
-          } else {
-            await SecureStore.setItemAsync("id_token", idToken);
-          }
+      if (response?.type === "success" && response?.authentication) {
+        const storedAccessToken = response?.authentication?.accessToken;
+        const storedIdToken = response?.authentication?.idToken;
+        if (storedIdToken) {
+          await storeIdToken(storedIdToken);
         }
-        if (accessToken) {
-          setToken(accessToken);
-          await storeToken(accessToken);
+        if (storedAccessToken) {
+          await storeAccessToken(storedAccessToken);
         }
+        router.replace("/MainPage");
       }
     };
-
     handleAuth();
   }, [response]);
 
@@ -120,9 +80,7 @@ export default function SignInPage() {
           marginVertical: 10,
         }}
         titleStyle={{ fontFamily: "PublicSans-Black" }}
-        onPress={async () => {
-          await promptAsync();
-        }}
+        onPress={() => promptAsync()}
       />
     </View>
   );

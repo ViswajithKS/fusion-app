@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, Keyboard, Platform } from "react-native";
-import { Input, Icon, Chip, SpeedDial, Dialog } from "react-native-elements";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SecureStore from "expo-secure-store";
+import { View, Text } from "react-native";
 import { router } from "expo-router";
 const jwtDecode = require("jwt-decode");
 import config from "../../config";
+import { storeIdToken, storeAccessToken, getIdToken } from "./tokenManager";
+import { ChatBoxOptions } from "@/components/ChatBoxOptions";
+import { LogoutDialog, LogoutButton } from "@/components/Logout";
+import { ChatScrollView } from "@/components/ChatScrollView";
+import { InputBox } from "@/components/InputBox";
 
 interface DecodedToken {
   email: string;
@@ -15,18 +17,12 @@ interface DecodedToken {
 export default function MainSreen() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState<string[]>([]);
-  const [open, setOpen] = useState(false);
   const [decoded, setDecoded] = useState<DecodedToken | null>(null);
-  const [visible, setVisible] = useState(false);
+  const [logoutVisible, setLogoutVisible] = useState(false);
 
   useEffect(() => {
     const fetchIdToken = async () => {
-      let token;
-      if (Platform.OS == "web") {
-        token = await AsyncStorage.getItem("id_token");
-      } else {
-        token = await SecureStore.getItemAsync("id_token");
-      }
+      const token = await getIdToken();
       if (token) {
         const decodedToken = jwtDecode.jwtDecode(token);
         setDecoded(decodedToken);
@@ -47,15 +43,8 @@ export default function MainSreen() {
   };
 
   const logout = async () => {
-    if (Platform.OS === "web") {
-      await AsyncStorage.removeItem("auth_token");
-      await AsyncStorage.removeItem("access_token");
-      await AsyncStorage.removeItem("id_token");
-    } else {
-      await SecureStore.deleteItemAsync("auth_token");
-      await SecureStore.deleteItemAsync("access_token");
-      await SecureStore.deleteItemAsync("id_token");
-    }
+    await storeAccessToken("");
+    await storeIdToken("");
     router.replace("/SignInPage");
   };
 
@@ -79,24 +68,11 @@ export default function MainSreen() {
   return (
     <>
       <View style={{ flex: 1 }}>
-        <Dialog
-          overlayStyle={{ borderRadius: 10, paddingRight: 50, maxWidth: 500 }}
-          isVisible={visible}
-          onBackdropPress={() => setVisible(false)}
-        >
-          <Dialog.Title title="Are you sure you want to logout?" />
-          <Dialog.Actions>
-            <Dialog.Button title="Cancel" onPress={() => setVisible(false)} />
-            <Dialog.Button
-              title="Yes"
-              onPress={async () => {
-                setVisible(false);
-                logout();
-              }}
-            />
-          </Dialog.Actions>
-        </Dialog>
-
+        <LogoutDialog
+          visible={logoutVisible}
+          setVisible={setLogoutVisible}
+          logout={logout}
+        />
         <View
           style={{
             width: "100%",
@@ -113,13 +89,7 @@ export default function MainSreen() {
             }}
           >
             <Text style={{ alignSelf: "center" }}>welcome {decoded?.name}</Text>
-            <Icon
-              containerStyle={{ alignSelf: "flex-end", marginRight: 10 }}
-              name="logout"
-              onPress={() => {
-                setVisible(true);
-              }}
-            ></Icon>
+            <LogoutButton setVisible={setLogoutVisible} />
           </View>
           <View
             style={{
@@ -139,117 +109,14 @@ export default function MainSreen() {
                 margin: 10,
               }}
             >
-              <ScrollView>
-                {chat.map((message, index) => {
-                  const alignment = index % 2 === 0 ? "flex-end" : "flex-start";
-                  return (
-                    <Chip
-                      key={index}
-                      buttonStyle={{
-                        backgroundColor: index % 2 ? "darkgray" : "gray",
-                      }}
-                      containerStyle={{
-                        alignSelf: alignment,
-                        maxWidth: "80%",
-                        marginVertical: 5,
-                        marginRight: 15,
-                      }}
-                      title={message}
-                    />
-                  );
-                })}
-              </ScrollView>
-              <SpeedDial
-                style={{ direction: "rtl" }}
-                containerStyle={{
-                  alignSelf: "flex-start",
-                  backgroundColor: "gray",
-                }}
-                isOpen={open}
-                icon={{ name: "edit", color: "#fff" }}
-                iconContainerStyle={{ backgroundColor: "black" }}
-                openIcon={{ name: "close", color: "#fff" }}
-                onOpen={() => setOpen(!open)}
-                onClose={() => setOpen(!open)}
-              >
-                <SpeedDial.Action
-                  icon={{ name: "add", color: "#fff" }}
-                  iconContainerStyle={{ backgroundColor: "black" }}
-                  title="add"
-                  onPress={() => console.log("Add Something")}
-                />
-                <SpeedDial.Action
-                  icon={{ name: "delete", color: "#fff" }}
-                  iconContainerStyle={{ backgroundColor: "black" }}
-                  title="delete"
-                  onPress={() => console.log("Delete Something")}
-                />
-              </SpeedDial>
+              <ChatScrollView chat={chat} message={message} />
+              <ChatBoxOptions />
             </View>
-            <View
-              style={{
-                //backgroundColor: "pink",
-                justifyContent: "center",
-                alignContent: "center",
-                flexDirection: "row",
-              }}
-            >
-              <View style={{ flex: 3, padding: 1 }}>
-                <Input
-                  multiline={true}
-                  numberOfLines={3}
-                  value={message}
-                  rightIcon={
-                    <Icon
-                      containerStyle={{
-                        //backgroundColor: "white",
-                        borderRadius: 50,
-                        padding: 5,
-                        borderWidth: 2,
-                        alignSelf: "center",
-                      }}
-                      name="send"
-                      onPress={handleSend}
-                    />
-                  }
-                  placeholder="Type a message..."
-                  inputContainerStyle={{
-                    backgroundColor: "white",
-                    width: "100%",
-                    minHeight: 80,
-                    alignSelf: "flex-end",
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 1,
-                    elevation: 5,
-                    padding: 5,
-                    borderBottomWidth: 0,
-                    borderRadius: 10,
-                  }}
-                  inputStyle={{
-                    //backgroundColor: "white",
-                    borderWidth: 0,
-                    padding: 10,
-                    outline: "none",
-                    borderBottomWidth: 0,
-                    borderRadius: 10,
-                    //margin: 10,
-                  }}
-                  onChangeText={(text) => {
-                    if (message !== "Thinking...") {
-                      setMessage(text);
-                    }
-                  }}
-                  onKeyPress={async (e) => {
-                    if (e.nativeEvent.key == "Enter" && Platform.OS === "web") {
-                      Keyboard.dismiss();
-                      handleSend();
-                    }
-                  }}
-                />
-              </View>
-            </View>
+            <InputBox
+              message={message}
+              setMessage={setMessage}
+              handleSend={handleSend}
+            />
           </View>
         </View>
       </View>
